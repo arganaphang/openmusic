@@ -1,0 +1,635 @@
+{
+  "yaakVersion": "2024.13.0",
+  "yaakSchema": 2,
+  "timestamp": "2025-02-10T17:53:59.084792",
+  "resources": {
+    "workspaces": [
+      {
+        "model": "workspace",
+        "id": "wk_TjZClTIOvE",
+        "createdAt": "2025-02-07T13:22:18",
+        "updatedAt": "2025-02-10T17:27:57",
+        "name": "Open Music",
+        "description": "",
+        "variables": [
+          {
+            "enabled": true,
+            "name": "HOST",
+            "value": "http://localhost:8000"
+          },
+          {
+            "enabled": true,
+            "name": "",
+            "value": ""
+          }
+        ],
+        "settingValidateCertificates": true,
+        "settingFollowRedirects": true,
+        "settingRequestTimeout": 0
+      }
+    ],
+    "environments": [],
+    "folders": [
+      {
+        "model": "folder",
+        "id": "fl_XzKFwwVShJ",
+        "createdAt": "2025-02-10T17:46:15",
+        "updatedAt": "2025-02-10T17:46:15",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": null,
+        "name": "Playlist",
+        "sortPriority": -1739209600000.0
+      },
+      {
+        "model": "folder",
+        "id": "fl_hRxKZHfN33",
+        "createdAt": "2025-02-10T17:43:35",
+        "updatedAt": "2025-02-10T17:43:35",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": null,
+        "name": "User",
+        "sortPriority": -1739209400000.0
+      },
+      {
+        "model": "folder",
+        "id": "fl_h9EzqDXKPc",
+        "createdAt": "2025-02-10T17:42:30",
+        "updatedAt": "2025-02-10T17:42:30",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": null,
+        "name": "Song",
+        "sortPriority": -1739209300000.0
+      },
+      {
+        "model": "folder",
+        "id": "fl_rFYisT6qon",
+        "createdAt": "2025-02-10T17:27:32",
+        "updatedAt": "2025-02-10T17:27:32",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": null,
+        "name": "Album",
+        "sortPriority": -1739208400000.0
+      }
+    ],
+    "httpRequests": [
+      {
+        "model": "http_request",
+        "id": "rq_ZXkOfXbW6l",
+        "createdAt": "2025-02-10T17:51:12",
+        "updatedAt": "2025-02-10T17:51:26",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"user_id\": \"user_1\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Assign Contributor Role",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists/:id/contributors/role",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_KapCrMjjuj",
+        "createdAt": "2025-02-10T17:47:48",
+        "updatedAt": "2025-02-10T17:50:33",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"user_id\": \"user_1\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Add Contributor",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists/:id/contributors",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_mxeuLFm1me",
+        "createdAt": "2025-02-10T17:46:50",
+        "updatedAt": "2025-02-10T17:48:02",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "DELETE",
+        "name": "Delete",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_H7cYSWNoMG",
+        "createdAt": "2025-02-10T17:46:46",
+        "updatedAt": "2025-02-10T17:52:05",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"First Playlist\",\n  \"is_public\": false\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "PUT",
+        "name": "Update",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_0u3WbWFAFz",
+        "createdAt": "2025-02-10T17:46:40",
+        "updatedAt": "2025-02-10T17:51:49",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"First Playlist\",\n  \"is_public\": true\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Create",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_PhC2pix5J2",
+        "createdAt": "2025-02-10T17:46:31",
+        "updatedAt": "2025-02-10T17:46:38",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get By ID",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_rNESrfrUAP",
+        "createdAt": "2025-02-10T17:46:19",
+        "updatedAt": "2025-02-10T17:46:29",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_XzKFwwVShJ",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get All",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/playlists",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_7E6AzUIMAW",
+        "createdAt": "2025-02-10T17:44:42",
+        "updatedAt": "2025-02-10T17:45:33",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"email\": \"johndoe@mail.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Login",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/login",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_svsaLXxiBR",
+        "createdAt": "2025-02-10T17:44:38",
+        "updatedAt": "2025-02-10T17:45:41",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"John Doe\",\n  \"email\": \"johndoe@mail.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Register",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/register",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_KB93ISrGaO",
+        "createdAt": "2025-02-10T17:44:28",
+        "updatedAt": "2025-02-10T17:44:32",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "DELETE",
+        "name": "Delete",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/users/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_lv4guC7OMI",
+        "createdAt": "2025-02-10T17:44:21",
+        "updatedAt": "2025-02-10T17:45:54",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"John Doe Update\",\n  \"email\": \"johndoe@mail.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "PUT",
+        "name": "Update",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/users/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_bblsSmzKSd",
+        "createdAt": "2025-02-10T17:44:12",
+        "updatedAt": "2025-02-10T17:45:49",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"John Doe\",\n  \"email\": \"johndoe@mail.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Create",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/users",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_uoPHad3fPG",
+        "createdAt": "2025-02-10T17:43:55",
+        "updatedAt": "2025-02-10T17:44:03",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get By ID",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/users/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_hA7n9mvNfd",
+        "createdAt": "2025-02-10T17:43:39",
+        "updatedAt": "2025-02-10T17:43:53",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_hRxKZHfN33",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get All",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/users",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_Yb5MqetUVI",
+        "createdAt": "2025-02-10T17:43:16",
+        "updatedAt": "2025-02-10T17:43:21",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_h9EzqDXKPc",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "DELETE",
+        "name": "Delete",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/songs/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_it64bCainv",
+        "createdAt": "2025-02-10T17:43:07",
+        "updatedAt": "2025-02-10T17:43:15",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_h9EzqDXKPc",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "PUT",
+        "name": "Update",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/songs/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_3uzsyUtAuF",
+        "createdAt": "2025-02-10T17:42:54",
+        "updatedAt": "2025-02-10T17:43:05",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_h9EzqDXKPc",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Create",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/songs",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_Ff2ykzWYYK",
+        "createdAt": "2025-02-10T17:42:46",
+        "updatedAt": "2025-02-10T17:42:55",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_h9EzqDXKPc",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get By ID",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/songs/:id",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_72HtK1KXKd",
+        "createdAt": "2025-02-10T17:42:35",
+        "updatedAt": "2025-02-10T17:42:45",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_h9EzqDXKPc",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get All",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/songs",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_1RIEDQLOIL",
+        "createdAt": "2025-02-10T17:30:58",
+        "updatedAt": "2025-02-10T17:36:38",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_rFYisT6qon",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "DELETE",
+        "name": "Delete",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/albums/:id",
+        "urlParameters": [
+          {
+            "enabled": true,
+            "name": ":id",
+            "value": "album-OF2W8RyQdVOq_csrhJ9CW"
+          },
+          {
+            "enabled": true,
+            "name": "",
+            "value": ""
+          }
+        ]
+      },
+      {
+        "model": "http_request",
+        "id": "rq_tf5kaR55zu",
+        "createdAt": "2025-02-10T17:30:41",
+        "updatedAt": "2025-02-10T17:34:47",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_rFYisT6qon",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"First Album Update\",\n  \"year\": 2024\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "PUT",
+        "name": "Update",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/albums/:id",
+        "urlParameters": [
+          {
+            "enabled": true,
+            "name": ":id",
+            "value": "album-OF2W8RyQdVOq_csrhJ9CW"
+          },
+          {
+            "enabled": true,
+            "name": "",
+            "value": ""
+          }
+        ]
+      },
+      {
+        "model": "http_request",
+        "id": "rq_PJAQcux5m8",
+        "createdAt": "2025-02-10T17:30:05",
+        "updatedAt": "2025-02-10T17:36:18",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_rFYisT6qon",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {
+          "text": "{\n  \"name\": \"Another Album\",\n  \"year\": 2020\n}"
+        },
+        "bodyType": "application/json",
+        "headers": [
+          {
+            "enabled": true,
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "name": "Create",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/albums",
+        "urlParameters": []
+      },
+      {
+        "model": "http_request",
+        "id": "rq_Y2e3ra3Khs",
+        "createdAt": "2025-02-10T17:28:41",
+        "updatedAt": "2025-02-10T17:34:39",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_rFYisT6qon",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get By ID",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/albums/:id",
+        "urlParameters": [
+          {
+            "enabled": true,
+            "name": ":id",
+            "value": "album-OF2W8RyQdVOq_csrhJ9CW"
+          },
+          {
+            "enabled": true,
+            "name": "",
+            "value": ""
+          }
+        ]
+      },
+      {
+        "model": "http_request",
+        "id": "rq_Vj3wkTQPFl",
+        "createdAt": "2025-02-10T17:27:34",
+        "updatedAt": "2025-02-10T17:28:15",
+        "workspaceId": "wk_TjZClTIOvE",
+        "folderId": "fl_rFYisT6qon",
+        "authentication": {},
+        "authenticationType": null,
+        "body": {},
+        "bodyType": null,
+        "headers": [],
+        "method": "GET",
+        "name": "Get All",
+        "sortPriority": -1739208400000.0,
+        "url": "${[ HOST ]}/albums",
+        "urlParameters": []
+      }
+    ],
+    "grpcRequests": []
+  }
+}
