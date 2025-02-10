@@ -14,20 +14,20 @@ type PlaylistRoute interface {
 }
 
 type playlistRoute struct {
-	Services service.Services
+	Services *service.Services
 }
 
-func NewPlaylistRoute(engine *gin.Engine, services service.Services) PlaylistRoute {
+func NewPlaylistRoute(engine *gin.Engine, services *service.Services) PlaylistRoute {
 	route := &playlistRoute{
 		Services: services,
 	}
 
 	group := engine.Group("/playlists")
-	group.GET("/", route.GetAll)
-	group.GET("/:id", route.GetByID)
-	group.POST("/", route.Create)
-	group.PUT("/:id", route.Update)
-	group.DELETE("/:id", route.Delete)
+	group.GET("", route.GetAll)
+	group.GET(":id", route.GetByID)
+	group.POST("", route.Create)
+	group.PUT(":id", route.Update)
+	group.DELETE(":id", route.Delete)
 
 	return route
 }

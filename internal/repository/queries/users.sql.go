@@ -60,12 +60,12 @@ func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
-const listUsers = `-- name: ListUsers :many
+const getUsers = `-- name: GetUsers :many
 SELECT id, name, email, password, created_at, updated_at FROM "users"
 `
 
-func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, listUsers)
+func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.Query(ctx, getUsers)
 	if err != nil {
 		return nil, err
 	}

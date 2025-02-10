@@ -16,20 +16,20 @@ type UserRoute interface {
 }
 
 type userRoute struct {
-	Services service.Services
+	Services *service.Services
 }
 
-func NewUserRoute(engine *gin.Engine, services service.Services) UserRoute {
+func NewUserRoute(engine *gin.Engine, services *service.Services) UserRoute {
 	route := &userRoute{
 		Services: services,
 	}
 
 	group := engine.Group("/users")
-	group.GET("/", route.GetAll)
-	group.GET("/:id", route.GetByID)
-	group.POST("/", route.Create)
-	group.PUT("/:id", route.Update)
-	group.DELETE("/:id", route.Delete)
+	group.GET("", route.GetAll)
+	group.GET(":id", route.GetByID)
+	group.POST("", route.Create)
+	group.PUT(":id", route.Update)
+	group.DELETE(":id", route.Delete)
 
 	return route
 }

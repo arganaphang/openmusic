@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/arganaphang/openmusic/internal/entity"
+	"github.com/arganaphang/openmusic/internal/repository/queries"
 )
 
 type UserRepository interface {
@@ -14,10 +15,14 @@ type UserRepository interface {
 	Delete(ctx context.Context, id int) error
 }
 
-type userRepository struct{}
+type userRepository struct {
+	Queries *queries.Queries
+}
 
-func NewUserRepository() UserRepository {
-	return &userRepository{}
+func NewUserRepository(queries *queries.Queries) UserRepository {
+	return &userRepository{
+		Queries: queries,
+	}
 }
 
 func (r userRepository) GetAll(ctx context.Context) ([]entity.User, error) {

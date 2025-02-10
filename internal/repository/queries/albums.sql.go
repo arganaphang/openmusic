@@ -10,16 +10,17 @@ import (
 )
 
 const createAlbum = `-- name: CreateAlbum :one
-INSERT INTO "albums" ("name", "year") VALUES ($1, $2) RETURNING id, name, year
+INSERT INTO "albums" ("id", "name", "year") VALUES ($1, $2, $3) RETURNING id, name, year
 `
 
 type CreateAlbumParams struct {
+	ID   string
 	Name string
 	Year int16
 }
 
 func (q *Queries) CreateAlbum(ctx context.Context, arg CreateAlbumParams) (Album, error) {
-	row := q.db.QueryRow(ctx, createAlbum, arg.Name, arg.Year)
+	row := q.db.QueryRow(ctx, createAlbum, arg.ID, arg.Name, arg.Year)
 	var i Album
 	err := row.Scan(&i.ID, &i.Name, &i.Year)
 	return i, err
@@ -45,12 +46,12 @@ func (q *Queries) GetAlbumByID(ctx context.Context, id string) (Album, error) {
 	return i, err
 }
 
-const listAlbums = `-- name: ListAlbums :many
+const getAlbums = `-- name: GetAlbums :many
 SELECT id, name, year FROM "albums"
 `
 
-func (q *Queries) ListAlbums(ctx context.Context) ([]Album, error) {
-	rows, err := q.db.Query(ctx, listAlbums)
+func (q *Queries) GetAlbums(ctx context.Context) ([]Album, error) {
+	rows, err := q.db.Query(ctx, getAlbums)
 	if err != nil {
 		return nil, err
 	}

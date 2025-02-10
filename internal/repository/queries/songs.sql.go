@@ -10,10 +10,11 @@ import (
 )
 
 const createSong = `-- name: CreateSong :one
-INSERT INTO "songs" ("title", "year", "genre", "performer", "duration", "album_id") VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, year, genre, performer, duration, album_id, created_at
+INSERT INTO "songs" ("id", "title", "year", "genre", "performer", "duration", "album_id") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, title, year, genre, performer, duration, album_id, created_at
 `
 
 type CreateSongParams struct {
+	ID        string
 	Title     string
 	Year      int16
 	Genre     string
@@ -24,6 +25,7 @@ type CreateSongParams struct {
 
 func (q *Queries) CreateSong(ctx context.Context, arg CreateSongParams) (Song, error) {
 	row := q.db.QueryRow(ctx, createSong,
+		arg.ID,
 		arg.Title,
 		arg.Year,
 		arg.Genre,
@@ -74,12 +76,12 @@ func (q *Queries) GetSongByID(ctx context.Context, id string) (Song, error) {
 	return i, err
 }
 
-const listSongs = `-- name: ListSongs :many
+const getSongs = `-- name: GetSongs :many
 SELECT id, title, year, genre, performer, duration, album_id, created_at FROM "songs"
 `
 
-func (q *Queries) ListSongs(ctx context.Context) ([]Song, error) {
-	rows, err := q.db.Query(ctx, listSongs)
+func (q *Queries) GetSongs(ctx context.Context) ([]Song, error) {
+	rows, err := q.db.Query(ctx, getSongs)
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(engine *gin.Engine, services service.Services) {
+func New(engine *gin.Engine, services *service.Services) {
 	// Album Route
 	NewAlbumRoute(engine, services)
 	// Playlist Route

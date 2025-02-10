@@ -16,10 +16,10 @@ type PlaylistService interface {
 }
 
 type playlistService struct {
-	Repositories repository.Repositories
+	Repositories *repository.Repositories
 }
 
-func NewPlaylistService(repositories repository.Repositories) PlaylistService {
+func NewPlaylistService(repositories *repository.Repositories) PlaylistService {
 	return &playlistService{
 		Repositories: repositories,
 	}

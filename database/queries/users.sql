@@ -1,4 +1,4 @@
--- name: ListUsers :many
+-- name: GetUsers :many
 SELECT * FROM "users";
 
 -- name: GetUserByID :one
