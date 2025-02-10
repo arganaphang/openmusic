@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS "albums" (
+    "id" VARCHAR PRIMARY KEY,
+    "name" VARCHAR NOT NULL,
+    "year" SMALLINT NOT NULL
+);
