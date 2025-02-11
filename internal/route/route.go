@@ -8,10 +8,10 @@ import (
 func New(engine *gin.Engine, services *service.Services) {
 	// Album Route
 	NewAlbumRoute(engine, services)
-	// Playlist Route
-	NewPlaylistRoute(engine, services)
 	// Song Route
 	NewSongRoute(engine, services)
+	// Playlist Route
+	NewPlaylistRoute(engine, services)
 	// User Route
 	NewUserRoute(engine, services)
 }
