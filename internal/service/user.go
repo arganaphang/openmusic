@@ -13,6 +13,9 @@ type UserService interface {
 	Create(ctx context.Context, user entity.User) (*entity.User, error)
 	Update(ctx context.Context, id int, user entity.User) (*entity.User, error)
 	Delete(ctx context.Context, id int) error
+
+	Register(ctx context.Context, user entity.User) (*entity.UserJWT, error)
+	Login(ctx context.Context, user entity.User) (*entity.UserJWT, error)
 }
 
 type userService struct {
@@ -43,4 +46,23 @@ func (s userService) Update(ctx context.Context, id int, album entity.User) (*en
 
 func (s userService) Delete(ctx context.Context, id int) error {
 	return s.Repositories.UserRepository.Delete(ctx, id)
+}
+
+func (s userService) Register(ctx context.Context, user entity.User) (*entity.UserJWT, error) {
+	_, err := s.Repositories.UserRepository.Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Create TOKEN
+	return nil, nil
+}
+
+func (s userService) Login(ctx context.Context, user entity.User) (*entity.UserJWT, error) {
+	_, err := s.Repositories.UserRepository.GetByEmail(ctx, user.Email)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Compare password
+	// TODO: Create token
+	return nil, nil
 }
