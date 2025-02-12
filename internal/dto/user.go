@@ -3,13 +3,13 @@ package dto
 import "github.com/arganaphang/openmusic/internal/entity"
 
 type UserGetAllResponse struct {
-	Success bool          `json:"success"`
+	Status  string        `json:"success"`
 	Message string        `json:"message"`
 	Data    []entity.User `json:"data"`
 }
 
 type UserGetByIDResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.User `json:"data"`
 }
@@ -21,7 +21,7 @@ type UserCreateRequest struct {
 }
 
 type UserCreateResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.User `json:"data"`
 }
@@ -33,13 +33,13 @@ type UserUpdateRequest struct {
 }
 
 type UserUpdateResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.User `json:"data"`
 }
 
 type UserDeleteResponse struct {
-	Success bool   `json:"success"`
+	Status  string `json:"success"`
 	Message string `json:"message"`
 }
 
@@ -50,7 +50,7 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Success bool            `json:"success"`
+	Status  string          `json:"success"`
 	Message string          `json:"message"`
 	Data    *entity.UserJWT `json:"data"`
 }
@@ -61,7 +61,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Success bool            `json:"success"`
+	Status  string          `json:"success"`
 	Message string          `json:"message"`
 	Data    *entity.UserJWT `json:"data"`
 }

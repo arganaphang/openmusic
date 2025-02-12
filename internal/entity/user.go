@@ -2,6 +2,11 @@ package entity
 
 import "time"
 
+type UserJWT struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 type User struct {
 	ID        int32     `json:"id"`
 	Name      string    `json:"name"`
@@ -11,7 +16,10 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type UserJWT struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+func (u User) JWTCreateToken() (*UserJWT, error) {
+	panic("unimplemented")
+}
+
+func (u User) JWTValidateToken() (*UserJWT, error) {
+	panic("unimplemented")
 }

@@ -3,13 +3,13 @@ package dto
 import "github.com/arganaphang/openmusic/internal/entity"
 
 type SongGetAllResponse struct {
-	Success bool          `json:"success"`
+	Status  string        `json:"success"`
 	Message string        `json:"message"`
 	Data    []entity.Song `json:"data"`
 }
 
 type SongGetByIDResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.Song `json:"data"`
 }
@@ -24,7 +24,7 @@ type SongCreateRequest struct {
 }
 
 type SongCreateResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.Song `json:"data"`
 }
@@ -39,12 +39,12 @@ type SongUpdateRequest struct {
 }
 
 type SongUpdateResponse struct {
-	Success bool         `json:"success"`
+	Status  string       `json:"success"`
 	Message string       `json:"message"`
 	Data    *entity.Song `json:"data"`
 }
 
 type SongDeleteResponse struct {
-	Success bool   `json:"success"`
+	Status  string `json:"success"`
 	Message string `json:"message"`
 }
