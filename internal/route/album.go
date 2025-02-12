@@ -108,14 +108,15 @@ func (r albumRoute) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	album, err := r.Services.AlbumService.Update(c, id, entity.Album{
-		Name: data.Name,
-		Year: data.Year,
-	})
+	_, err := r.Services.AlbumService.GetByID(c, id)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
+	album, err := r.Services.AlbumService.Update(c, id, entity.Album{
+		Name: data.Name,
+		Year: data.Year,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return

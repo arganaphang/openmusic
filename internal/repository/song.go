@@ -57,10 +57,10 @@ func (r songRepository) GetByAlbumID(ctx context.Context, albumID string) ([]ent
 }
 
 func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.Song, error) {
-	id := fmt.Sprintf("song-%s", gonanoid.Must())
+	song.ID = fmt.Sprintf("song-%s", gonanoid.Must())
 	sql, _, _ := goqu.Insert(entity.TABLE_SONGS).
 		Cols("id", "title", "year", "genre", "performer", "duration", "album_id").
-		Vals(goqu.Vals{id, song.Title, song.Year, song.Genre, song.Performer, song.Duration, song.AlbumID}).
+		Vals(goqu.Vals{song.ID, song.Title, song.Year, song.Genre, song.Performer, song.Duration, song.AlbumID}).
 		ToSQL()
 	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
@@ -69,7 +69,8 @@ func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.S
 }
 
 func (r songRepository) Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error) {
-	sql, _, _ := goqu.Update(entity.TABLE_ALBUMS).
+	song.ID = id
+	sql, _, _ := goqu.Update(entity.TABLE_SONGS).
 		Set(goqu.Record{
 			"title":     song.Title,
 			"year":      song.Year,
@@ -78,7 +79,7 @@ func (r songRepository) Update(ctx context.Context, id string, song entity.Song)
 			"duration":  song.Duration,
 			"album_id":  song.AlbumID,
 		}).
-		Where(goqu.C("id").Eq(id)).
+		Where(goqu.C("id").Eq(song.ID)).
 		ToSQL()
 	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err

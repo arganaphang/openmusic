@@ -101,6 +101,11 @@ func (r songRoute) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
+	_, err := r.Services.SongService.GetByID(c, id)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
 	song, err := r.Services.SongService.Update(c, id, entity.Song{
 		Title:     body.Title,
 		Year:      body.Year,
@@ -109,10 +114,6 @@ func (r songRoute) Update(c *gin.Context) {
 		Duration:  body.Duration,
 		AlbumID:   body.AlbumID,
 	})
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
-		return
-	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return

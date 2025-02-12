@@ -38,7 +38,7 @@ func (r albumRepository) GetAll(ctx context.Context) ([]entity.Album, error) {
 }
 
 func (r albumRepository) GetByID(ctx context.Context, id string) (*entity.Album, error) {
-	sql, _, _ := goqu.From(entity.TABLE_ALBUMS).Where(goqu.Ex{"id": id}).ToSQL()
+	sql, _, _ := goqu.From(entity.TABLE_ALBUMS).Where(goqu.C("id").Eq(id)).ToSQL()
 	album := entity.Album{}
 	if err := r.DB.Get(&album, sql); err != nil {
 		return nil, err
@@ -47,10 +47,10 @@ func (r albumRepository) GetByID(ctx context.Context, id string) (*entity.Album,
 }
 
 func (r albumRepository) Create(ctx context.Context, album entity.Album) (*entity.Album, error) {
-	id := fmt.Sprintf("album-%s", gonanoid.Must())
+	album.ID = fmt.Sprintf("album-%s", gonanoid.Must())
 	sql, _, _ := goqu.Insert(entity.TABLE_ALBUMS).
 		Cols("id", "name", "year").
-		Vals(goqu.Vals{id, album.Name, album.Name}).
+		Vals(goqu.Vals{album.ID, album.Name, album.Year}).
 		ToSQL()
 	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
@@ -59,13 +59,17 @@ func (r albumRepository) Create(ctx context.Context, album entity.Album) (*entit
 }
 
 func (r albumRepository) Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error) {
-	sql, _, _ := goqu.Update(entity.TABLE_ALBUMS).
+	album.ID = id
+	sql, _, err := goqu.Update(entity.TABLE_ALBUMS).
 		Set(goqu.Record{
 			"name": album.Name,
 			"year": album.Year,
 		}).
-		Where(goqu.C("id").Eq(id)).
+		Where(goqu.C("id").Eq(album.ID)).
 		ToSQL()
+	if err != nil {
+		return nil, err
+	}
 	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
 	}
