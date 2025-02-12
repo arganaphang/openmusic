@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -27,11 +26,6 @@ var p = &params{
 	keyLength:   32,
 }
 
-var (
-	ErrInvalidHash         = errors.New("the encoded hash is not in the correct format")
-	ErrIncompatibleVersion = errors.New("incompatible version of argon2")
-)
-
 func HashCreate(s string) (*string, error) {
 	salt, err := generateRandomBytes(p.saltLength)
 	if err != nil {
@@ -48,8 +42,8 @@ func HashCreate(s string) (*string, error) {
 	return &encodedHash, nil
 }
 
-func HashCompare(s string, c string) bool {
-	p, salt, hash, err := decodeHash(c)
+func HashCompare(s string, h string) bool {
+	p, salt, hash, err := decodeHash(h)
 	if err != nil {
 		return false
 	}

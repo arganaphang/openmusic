@@ -6,6 +6,7 @@ import (
 	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/repository"
+	"github.com/arganaphang/openmusic/pkg"
 )
 
 type UserService interface {
@@ -18,6 +19,7 @@ type UserService interface {
 
 	Register(ctx context.Context, data dto.RegisterRequest) (*entity.UserJWT, error)
 	Login(ctx context.Context, data dto.LoginRequest) (*entity.UserJWT, error)
+	RefreshToken(ctx context.Context, data dto.RefreshTokenRequest) (*entity.UserJWT, error)
 }
 
 type userService struct {
@@ -68,11 +70,24 @@ func (s userService) Register(ctx context.Context, data dto.RegisterRequest) (*e
 }
 
 func (s userService) Login(ctx context.Context, data dto.LoginRequest) (*entity.UserJWT, error) {
-	_, err := s.Repositories.UserRepository.GetByUsername(ctx, data.Username)
+	user, err := s.Repositories.UserRepository.GetByUsername(ctx, data.Username)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Compare password
-	// TODO: Create token
-	return nil, nil
+	if !pkg.HashCompare(data.Password, user.Password) {
+		return nil, pkg.ErrUnauthorized
+	}
+	token, err := pkg.JWTEncode(*user)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
+func (s userService) RefreshToken(ctx context.Context, data dto.RefreshTokenRequest) (*entity.UserJWT, error) {
+	token, err := pkg.JWTRefresh(data.AccessToken, data.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }

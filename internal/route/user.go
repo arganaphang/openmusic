@@ -7,6 +7,7 @@ import (
 
 	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/service"
+	"github.com/arganaphang/openmusic/pkg"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,7 @@ type UserRoute interface {
 	Delete(c *gin.Context)
 	Register(c *gin.Context)
 	Login(c *gin.Context)
+	RefreshToken(c *gin.Context)
 }
 
 type userRoute struct {
@@ -31,6 +33,7 @@ func NewUserRoute(engine *gin.Engine, services *service.Services) UserRoute {
 	{
 		engine.POST("/register", route.Register)
 		engine.POST("/login", route.Login)
+		engine.PUT("/refresh-token", route.RefreshToken)
 	}
 	group := engine.Group("/users")
 	{
@@ -173,7 +176,20 @@ func (r userRoute) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
+	_, err := r.Services.UserService.GetByUsername(c, body.Username)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusUnauthorized, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
 	token, err := r.Services.UserService.Login(c, body)
+	if err != nil && errors.Is(err, pkg.ErrUnauthorized) {
+		c.JSON(http.StatusUnauthorized, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -182,5 +198,27 @@ func (r userRoute) Login(c *gin.Context) {
 		Status:  "success",
 		Message: "login success",
 		Data:    dto.LoginResponseData{Token: token},
+	})
+}
+
+func (r userRoute) RefreshToken(c *gin.Context) {
+	var body dto.RefreshTokenRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	token, err := r.Services.UserService.RefreshToken(c, body)
+	if err != nil && errors.Is(err, pkg.ErrUnauthorized) {
+		c.JSON(http.StatusUnauthorized, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, dto.RefreshTokenResponse{
+		Status:  "success",
+		Message: "refresh token success",
+		Data:    dto.RefreshTokenResponseData{Token: token},
 	})
 }

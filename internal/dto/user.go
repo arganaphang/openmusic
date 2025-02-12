@@ -94,3 +94,18 @@ type LoginResponse struct {
 type LoginResponseData struct {
 	Token *entity.UserJWT `json:"token"`
 }
+
+type RefreshTokenRequest struct {
+	AccessToken  string `json:"access_token" binding:"required"`
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+type RefreshTokenResponse struct {
+	Status  string                   `json:"status"`
+	Message string                   `json:"message"`
+	Data    RefreshTokenResponseData `json:"data"`
+}
+
+type RefreshTokenResponseData struct {
+	Token *entity.UserJWT `json:"token"`
+}
