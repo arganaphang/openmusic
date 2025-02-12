@@ -3,19 +3,21 @@ package service
 import (
 	"context"
 
+	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/repository"
 )
 
 type UserService interface {
 	GetAll(ctx context.Context) ([]entity.User, error)
-	GetByID(ctx context.Context, id int) (*entity.User, error)
-	Create(ctx context.Context, user entity.User) (*entity.User, error)
-	Update(ctx context.Context, id int, user entity.User) (*entity.User, error)
-	Delete(ctx context.Context, id int) error
+	GetByID(ctx context.Context, id string) (*entity.User, error)
+	GetByUsername(ctx context.Context, username string) (*entity.User, error)
+	Create(ctx context.Context, data dto.UserCreateRequest) (*entity.User, error)
+	Update(ctx context.Context, id string, data dto.UserUpdateRequest) (*entity.User, error)
+	Delete(ctx context.Context, id string) error
 
-	Register(ctx context.Context, user entity.User) (*entity.UserJWT, error)
-	Login(ctx context.Context, user entity.User) (*entity.UserJWT, error)
+	Register(ctx context.Context, data dto.RegisterRequest) (*entity.UserJWT, error)
+	Login(ctx context.Context, data dto.LoginRequest) (*entity.UserJWT, error)
 }
 
 type userService struct {
@@ -32,24 +34,32 @@ func (s userService) GetAll(ctx context.Context) ([]entity.User, error) {
 	return s.Repositories.UserRepository.GetAll(ctx)
 }
 
-func (s userService) GetByID(ctx context.Context, id int) (*entity.User, error) {
+func (s userService) GetByID(ctx context.Context, id string) (*entity.User, error) {
 	return s.Repositories.UserRepository.GetByID(ctx, id)
 }
 
-func (s userService) Create(ctx context.Context, album entity.User) (*entity.User, error) {
-	return s.Repositories.UserRepository.Create(ctx, album)
+func (s userService) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
+	return s.Repositories.UserRepository.GetByUsername(ctx, username)
 }
 
-func (s userService) Update(ctx context.Context, id int, album entity.User) (*entity.User, error) {
-	return s.Repositories.UserRepository.Update(ctx, id, album)
+func (s userService) Create(ctx context.Context, data dto.UserCreateRequest) (*entity.User, error) {
+	return s.Repositories.UserRepository.Create(ctx, data)
 }
 
-func (s userService) Delete(ctx context.Context, id int) error {
+func (s userService) Update(ctx context.Context, id string, data dto.UserUpdateRequest) (*entity.User, error) {
+	return s.Repositories.UserRepository.Update(ctx, id, data)
+}
+
+func (s userService) Delete(ctx context.Context, id string) error {
 	return s.Repositories.UserRepository.Delete(ctx, id)
 }
 
-func (s userService) Register(ctx context.Context, user entity.User) (*entity.UserJWT, error) {
-	_, err := s.Repositories.UserRepository.Create(ctx, user)
+func (s userService) Register(ctx context.Context, data dto.RegisterRequest) (*entity.UserJWT, error) {
+	_, err := s.Repositories.UserRepository.Create(ctx, dto.UserCreateRequest{
+		Fullname: data.Fullname,
+		Username: data.Username,
+		Password: data.Password,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +67,8 @@ func (s userService) Register(ctx context.Context, user entity.User) (*entity.Us
 	return nil, nil
 }
 
-func (s userService) Login(ctx context.Context, user entity.User) (*entity.UserJWT, error) {
-	_, err := s.Repositories.UserRepository.GetByEmail(ctx, user.Email)
+func (s userService) Login(ctx context.Context, data dto.LoginRequest) (*entity.UserJWT, error) {
+	_, err := s.Repositories.UserRepository.GetByUsername(ctx, data.Username)
 	if err != nil {
 		return nil, err
 	}

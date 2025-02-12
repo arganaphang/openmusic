@@ -28,8 +28,8 @@ type UserGetByIDResponseData struct {
 }
 
 type UserCreateRequest struct {
-	Name     string `json:"name" binding:"required,email"`
-	Email    string `json:"email" binding:"required,email"`
+	Fullname string `json:"fullname" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -40,12 +40,12 @@ type UserCreateResponse struct {
 }
 
 type UserCreateResponseData struct {
-	User *entity.User `json:"users"`
+	User *entity.User `json:"user"`
 }
 
 type UserUpdateRequest struct {
-	Name     string `json:"name" binding:"required,email"`
-	Email    string `json:"email" binding:"required,email"`
+	Fullname string `json:"fullname" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -65,8 +65,8 @@ type UserDeleteResponse struct {
 }
 
 type RegisterRequest struct {
-	Name     string `json:"name" binding:"required,email"`
-	Email    string `json:"email" binding:"required,email"`
+	Fullname string `json:"fullname" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -81,7 +81,7 @@ type RegisterResponseData struct {
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 

@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/arganaphang/openmusic/internal/dto"
-	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -60,11 +58,7 @@ func (r userRoute) GetAll(c *gin.Context) {
 }
 
 func (r userRoute) GetByID(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
-		return
-	}
+	id := c.Param("id")
 	user, err := r.Services.UserService.GetByID(c, id)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
@@ -87,11 +81,16 @@ func (r userRoute) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	user, err := r.Services.UserService.Create(c, entity.User{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: body.Password,
-	})
+	userExist, err := r.Services.UserService.GetByUsername(c, body.Username)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	if userExist != nil {
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: "user already exist"})
+		return
+	}
+	user, err := r.Services.UserService.Create(c, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -104,21 +103,13 @@ func (r userRoute) Create(c *gin.Context) {
 }
 
 func (r userRoute) Update(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
-		return
-	}
+	id := c.Param("id")
 	var body dto.UserUpdateRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	user, err := r.Services.UserService.Update(c, id, entity.User{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: body.Password,
-	})
+	user, err := r.Services.UserService.Update(c, id, body)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -135,12 +126,8 @@ func (r userRoute) Update(c *gin.Context) {
 }
 
 func (r userRoute) Delete(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
-		return
-	}
-	_, err = r.Services.UserService.GetByID(c, id)
+	id := c.Param("id")
+	_, err := r.Services.UserService.GetByID(c, id)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -159,11 +146,16 @@ func (r userRoute) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	token, err := r.Services.UserService.Register(c, entity.User{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: body.Password,
-	})
+	userExist, err := r.Services.UserService.GetByUsername(c, body.Username)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	if userExist != nil {
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: "user already exist"})
+		return
+	}
+	token, err := r.Services.UserService.Register(c, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -176,15 +168,12 @@ func (r userRoute) Register(c *gin.Context) {
 }
 
 func (r userRoute) Login(c *gin.Context) {
-	var body dto.RegisterRequest
+	var body dto.LoginRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	token, err := r.Services.UserService.Login(c, entity.User{
-		Email:    body.Email,
-		Password: body.Password,
-	})
+	token, err := r.Services.UserService.Login(c, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
