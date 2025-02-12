@@ -1,6 +1,6 @@
 package dto
 
 type CommonResponse struct {
-	Status  string `json:"success"`
+	Status  string `json:"status"`
 	Message string `json:"message"`
 }

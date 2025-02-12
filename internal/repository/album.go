@@ -32,7 +32,7 @@ func (r albumRepository) GetAll(ctx context.Context) ([]entity.Album, error) {
 	if err != nil {
 		return nil, err
 	}
-	var albums []entity.Album
+	albums := []entity.Album{}
 	for _, row := range results {
 		albums = append(albums, entity.Album{
 			ID:   row.ID,

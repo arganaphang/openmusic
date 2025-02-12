@@ -21,7 +21,7 @@ type Song struct {
 	Genre     string
 	Performer string
 	Duration  int16
-	AlbumID   string
+	AlbumID   pgtype.Text
 	CreatedAt pgtype.Timestamp
 }
 

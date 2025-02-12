@@ -9,6 +9,6 @@ type Song struct {
 	Genre     string    `json:"genre"`
 	Performer string    `json:"performer"`
 	Duration  int16     `json:"duration"`
-	AlbumID   string    `json:"album_id"`
+	AlbumID   *string   `json:"album_id"`
 	CreatedAt time.Time `json:"created_at"`
 }

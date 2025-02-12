@@ -7,6 +7,8 @@ package queries
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createSong = `-- name: CreateSong :one
@@ -20,7 +22,7 @@ type CreateSongParams struct {
 	Genre     string
 	Performer string
 	Duration  int16
-	AlbumID   string
+	AlbumID   pgtype.Text
 }
 
 func (q *Queries) CreateSong(ctx context.Context, arg CreateSongParams) (Song, error) {
@@ -54,6 +56,39 @@ DELETE FROM "songs" WHERE "id" = $1
 func (q *Queries) DeleteSong(ctx context.Context, id string) error {
 	_, err := q.db.Exec(ctx, deleteSong, id)
 	return err
+}
+
+const getSongByAlbumID = `-- name: GetSongByAlbumID :many
+SELECT id, title, year, genre, performer, duration, album_id, created_at FROM "songs" WHERE "album_id" = $1
+`
+
+func (q *Queries) GetSongByAlbumID(ctx context.Context, albumID pgtype.Text) ([]Song, error) {
+	rows, err := q.db.Query(ctx, getSongByAlbumID, albumID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Song
+	for rows.Next() {
+		var i Song
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Year,
+			&i.Genre,
+			&i.Performer,
+			&i.Duration,
+			&i.AlbumID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getSongByID = `-- name: GetSongByID :one
@@ -119,7 +154,7 @@ type UpdateSongParams struct {
 	Genre     string
 	Performer string
 	Duration  int16
-	AlbumID   string
+	AlbumID   pgtype.Text
 	ID        string
 }
 

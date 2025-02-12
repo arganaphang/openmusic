@@ -5,3 +5,10 @@ type Album struct {
 	Name string `json:"name"`
 	Year int16  `json:"year"`
 }
+
+type AlbumWithSongs struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Year  int16  `json:"year"`
+	Songs []Song `json:"songs"`
+}

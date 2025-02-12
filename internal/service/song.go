@@ -10,6 +10,7 @@ import (
 type SongService interface {
 	GetAll(ctx context.Context) ([]entity.Song, error)
 	GetByID(ctx context.Context, id string) (*entity.Song, error)
+	GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error)
 	Create(ctx context.Context, song entity.Song) (*entity.Song, error)
 	Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error)
 	Delete(ctx context.Context, id string) error
@@ -31,6 +32,10 @@ func (s songService) GetAll(ctx context.Context) ([]entity.Song, error) {
 
 func (s songService) GetByID(ctx context.Context, id string) (*entity.Song, error) {
 	return s.Repositories.SongRepository.GetByID(ctx, id)
+}
+
+func (s songService) GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error) {
+	return s.Repositories.SongRepository.GetByAlbumID(ctx, albumID)
 }
 
 func (s songService) Create(ctx context.Context, album entity.Song) (*entity.Song, error) {

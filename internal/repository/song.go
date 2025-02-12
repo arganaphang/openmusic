@@ -6,12 +6,14 @@ import (
 
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/repository/queries"
+	"github.com/jackc/pgx/v5/pgtype"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type SongRepository interface {
 	GetAll(ctx context.Context) ([]entity.Song, error)
 	GetByID(ctx context.Context, id string) (*entity.Song, error)
+	GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error)
 	Create(ctx context.Context, song entity.Song) (*entity.Song, error)
 	Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error)
 	Delete(ctx context.Context, id string) error
@@ -32,13 +34,17 @@ func (r songRepository) GetAll(ctx context.Context) ([]entity.Song, error) {
 	if err != nil {
 		return nil, err
 	}
-	var songs []entity.Song
+	songs := []entity.Song{}
 	for _, result := range results {
+		var albumID *string
+		if result.AlbumID.Valid {
+			albumID = &result.AlbumID.String
+		}
 		songs = append(songs, entity.Song{
 			ID:        result.ID,
 			Title:     result.Title,
 			Performer: result.Performer,
-			AlbumID:   result.AlbumID,
+			AlbumID:   albumID,
 			Year:      result.Year,
 			Genre:     result.Genre,
 			Duration:  result.Duration,
@@ -53,11 +59,15 @@ func (r songRepository) GetByID(ctx context.Context, id string) (*entity.Song, e
 	if err != nil {
 		return nil, err
 	}
+	var albumID *string
+	if result.AlbumID.Valid {
+		albumID = &result.AlbumID.String
+	}
 	return &entity.Song{
 		ID:        result.ID,
 		Title:     result.Title,
 		Performer: result.Performer,
-		AlbumID:   result.AlbumID,
+		AlbumID:   albumID,
 		Year:      result.Year,
 		Genre:     result.Genre,
 		Duration:  result.Duration,
@@ -65,7 +75,39 @@ func (r songRepository) GetByID(ctx context.Context, id string) (*entity.Song, e
 	}, nil
 }
 
+func (r songRepository) GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error) {
+	results, err := r.Queries.GetSongByAlbumID(ctx, pgtype.Text{
+		Valid:  true,
+		String: albumID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	songs := []entity.Song{}
+	for _, result := range results {
+		var albumID *string
+		if result.AlbumID.Valid {
+			albumID = &result.AlbumID.String
+		}
+		songs = append(songs, entity.Song{
+			ID:        result.ID,
+			Title:     result.Title,
+			Performer: result.Performer,
+			AlbumID:   albumID,
+			Year:      result.Year,
+			Genre:     result.Genre,
+			Duration:  result.Duration,
+			CreatedAt: result.CreatedAt.Time,
+		})
+	}
+	return songs, nil
+}
+
 func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.Song, error) {
+	var albumID string
+	if song.AlbumID != nil {
+		albumID = *song.AlbumID
+	}
 	result, err := r.Queries.CreateSong(ctx, queries.CreateSongParams{
 		ID:        fmt.Sprintf("song-%s", gonanoid.Must()),
 		Title:     song.Title,
@@ -73,7 +115,10 @@ func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.S
 		Genre:     song.Genre,
 		Performer: song.Performer,
 		Duration:  song.Duration,
-		AlbumID:   song.AlbumID,
+		AlbumID: pgtype.Text{
+			Valid:  song.AlbumID != nil,
+			String: albumID,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -82,7 +127,7 @@ func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.S
 		ID:        result.ID,
 		Title:     result.Title,
 		Performer: result.Performer,
-		AlbumID:   result.AlbumID,
+		AlbumID:   &albumID,
 		Year:      result.Year,
 		Genre:     result.Genre,
 		Duration:  result.Duration,
@@ -91,6 +136,10 @@ func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.S
 }
 
 func (r songRepository) Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error) {
+	var albumID string
+	if song.AlbumID != nil {
+		albumID = *song.AlbumID
+	}
 	result, err := r.Queries.UpdateSong(ctx, queries.UpdateSongParams{
 		ID:        id,
 		Title:     song.Title,
@@ -98,7 +147,10 @@ func (r songRepository) Update(ctx context.Context, id string, song entity.Song)
 		Genre:     song.Genre,
 		Performer: song.Performer,
 		Duration:  song.Duration,
-		AlbumID:   song.AlbumID,
+		AlbumID: pgtype.Text{
+			Valid:  song.AlbumID != nil,
+			String: albumID,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -107,7 +159,7 @@ func (r songRepository) Update(ctx context.Context, id string, song entity.Song)
 		ID:        result.ID,
 		Title:     result.Title,
 		Performer: result.Performer,
-		AlbumID:   result.AlbumID,
+		AlbumID:   &albumID,
 		Year:      result.Year,
 		Genre:     result.Genre,
 		Duration:  result.Duration,

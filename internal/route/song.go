@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/arganaphang/openmusic/internal/dto"
@@ -39,26 +41,38 @@ func NewSongRoute(engine *gin.Engine, services *service.Services) SongRoute {
 func (r songRoute) GetAll(c *gin.Context) {
 	songs, err := r.Services.SongService.GetAll(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "failed", Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, dto.SongGetAllResponse{Status: "success", Message: "get songs", Data: songs})
+	c.JSON(http.StatusOK, dto.SongGetAllResponse{
+		Status:  "success",
+		Message: "get songs",
+		Data:    dto.SongGetAllResponseData{Songs: songs},
+	})
 }
 
 func (r songRoute) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	song, err := r.Services.SongService.GetByID(c, id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "failed", Message: err.Error()})
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, dto.SongGetByIDResponse{Status: "success", Message: "get song", Data: song})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, dto.SongGetByIDResponse{
+		Status:  "success",
+		Message: "get song",
+		Data:    dto.SongGetByIDResponseData{Song: song},
+	})
 }
 
 func (r songRoute) Create(c *gin.Context) {
 	var body dto.SongCreateRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "failed", Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 	song, err := r.Services.SongService.Create(c, entity.Song{
@@ -70,17 +84,21 @@ func (r songRoute) Create(c *gin.Context) {
 		AlbumID:   body.AlbumID,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "failed", Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, dto.SongCreateResponse{Status: "success", Message: "song created", Data: song})
+	c.JSON(http.StatusCreated, dto.SongCreateResponse{
+		Status:  "success",
+		Message: "song created",
+		Data:    dto.SongCreateResponseData{Song: song},
+	})
 }
 
 func (r songRoute) Update(c *gin.Context) {
 	id := c.Param("id")
 	var body dto.SongUpdateRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "failed", Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 	song, err := r.Services.SongService.Update(c, id, entity.Song{
@@ -91,18 +109,34 @@ func (r songRoute) Update(c *gin.Context) {
 		Duration:  body.Duration,
 		AlbumID:   body.AlbumID,
 	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "failed", Message: err.Error()})
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, dto.SongUpdateResponse{Status: "success", Message: "song updated", Data: song})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	c.JSON(
+		http.StatusOK,
+		dto.SongUpdateResponse{
+			Status:  "success",
+			Message: "song updated",
+			Data:    dto.SongUpdateResponseData{Song: song},
+		},
+	)
 }
 
 func (r songRoute) Delete(c *gin.Context) {
 	id := c.Param("id")
-	err := r.Services.SongService.Delete(c, id)
+	_, err := r.Services.SongService.GetByID(c, id)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	err = r.Services.SongService.Delete(c, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "failed", Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, dto.SongDeleteResponse{Status: "success", Message: "song deleted"})
