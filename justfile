@@ -2,7 +2,6 @@ set dotenv-load
 
 setup:
 	go install github.com/bitfield/gotestdox/cmd/gotestdox@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
 format:
 	gofumpt -l -w .
