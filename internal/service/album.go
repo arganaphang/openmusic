@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/repository"
 )
@@ -10,8 +11,8 @@ import (
 type AlbumService interface {
 	GetAll(ctx context.Context) ([]entity.Album, error)
 	GetByID(ctx context.Context, id string) (*entity.Album, error)
-	Create(ctx context.Context, album entity.Album) (*entity.Album, error)
-	Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error)
+	Create(ctx context.Context, data dto.AlbumCreateRequest) (*entity.Album, error)
+	Update(ctx context.Context, id string, data dto.AlbumUpdateRequest) (*entity.Album, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -33,12 +34,12 @@ func (s albumService) GetByID(ctx context.Context, id string) (*entity.Album, er
 	return s.Repositories.AlbumRepository.GetByID(ctx, id)
 }
 
-func (s albumService) Create(ctx context.Context, album entity.Album) (*entity.Album, error) {
-	return s.Repositories.AlbumRepository.Create(ctx, album)
+func (s albumService) Create(ctx context.Context, data dto.AlbumCreateRequest) (*entity.Album, error) {
+	return s.Repositories.AlbumRepository.Create(ctx, data)
 }
 
-func (s albumService) Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error) {
-	return s.Repositories.AlbumRepository.Update(ctx, id, album)
+func (s albumService) Update(ctx context.Context, id string, data dto.AlbumUpdateRequest) (*entity.Album, error) {
+	return s.Repositories.AlbumRepository.Update(ctx, id, data)
 }
 
 func (s albumService) Delete(ctx context.Context, id string) error {

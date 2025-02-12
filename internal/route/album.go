@@ -81,15 +81,12 @@ func (r albumRoute) GetByID(c *gin.Context) {
 }
 
 func (r albumRoute) Create(c *gin.Context) {
-	var data dto.AlbumCreateRequest
-	if err := c.ShouldBindJSON(&data); err != nil {
+	var body dto.AlbumCreateRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	album, err := r.Services.AlbumService.Create(c, entity.Album{
-		Name: data.Name,
-		Year: data.Year,
-	})
+	album, err := r.Services.AlbumService.Create(c, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -103,8 +100,8 @@ func (r albumRoute) Create(c *gin.Context) {
 
 func (r albumRoute) Update(c *gin.Context) {
 	id := c.Param("id")
-	var data dto.AlbumUpdateRequest
-	if err := c.ShouldBindJSON(&data); err != nil {
+	var body dto.AlbumUpdateRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
@@ -113,10 +110,7 @@ func (r albumRoute) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	album, err := r.Services.AlbumService.Update(c, id, entity.Album{
-		Name: data.Name,
-		Year: data.Year,
-	})
+	album, err := r.Services.AlbumService.Update(c, id, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/jmoiron/sqlx"
@@ -11,11 +12,11 @@ import (
 )
 
 type SongRepository interface {
-	GetAll(ctx context.Context) ([]entity.Song, error)
+	GetAll(ctx context.Context, params dto.SongGetAllRequest) ([]entity.Song, error)
 	GetByID(ctx context.Context, id string) (*entity.Song, error)
 	GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error)
-	Create(ctx context.Context, song entity.Song) (*entity.Song, error)
-	Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error)
+	Create(ctx context.Context, data dto.SongCreateRequest) (*entity.Song, error)
+	Update(ctx context.Context, id string, data dto.SongUpdateRequest) (*entity.Song, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -29,8 +30,15 @@ func NewSongRepository(DB *sqlx.DB) SongRepository {
 	}
 }
 
-func (r songRepository) GetAll(ctx context.Context) ([]entity.Song, error) {
-	sql, _, _ := goqu.From(entity.TABLE_SONGS).ToSQL()
+func (r songRepository) GetAll(ctx context.Context, params dto.SongGetAllRequest) ([]entity.Song, error) {
+	stmt := goqu.From(entity.TABLE_SONGS)
+	if params.Title != "" {
+		stmt = stmt.Where(goqu.C("title").ILike(fmt.Sprintf("%%%s%%", params.Title)))
+	}
+	if params.Performer != "" {
+		stmt = stmt.Where(goqu.C("performer").ILike(fmt.Sprintf("%%%s%%", params.Performer)))
+	}
+	sql, _, _ := stmt.ToSQL()
 	songs := []entity.Song{}
 	if err := r.DB.Select(&songs, sql); err != nil {
 		return nil, err
@@ -56,8 +64,16 @@ func (r songRepository) GetByAlbumID(ctx context.Context, albumID string) ([]ent
 	return songs, nil
 }
 
-func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.Song, error) {
-	song.ID = fmt.Sprintf("song-%s", gonanoid.Must())
+func (r songRepository) Create(ctx context.Context, data dto.SongCreateRequest) (*entity.Song, error) {
+	song := entity.Song{
+		ID:        fmt.Sprintf("song-%s", gonanoid.Must()),
+		Title:     data.Title,
+		Year:      data.Year,
+		Genre:     data.Genre,
+		Performer: data.Performer,
+		Duration:  data.Duration,
+		AlbumID:   data.AlbumID,
+	}
 	sql, _, _ := goqu.Insert(entity.TABLE_SONGS).
 		Cols("id", "title", "year", "genre", "performer", "duration", "album_id").
 		Vals(goqu.Vals{song.ID, song.Title, song.Year, song.Genre, song.Performer, song.Duration, song.AlbumID}).
@@ -68,8 +84,16 @@ func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.S
 	return &song, nil
 }
 
-func (r songRepository) Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error) {
-	song.ID = id
+func (r songRepository) Update(ctx context.Context, id string, data dto.SongUpdateRequest) (*entity.Song, error) {
+	song := entity.Song{
+		ID:        id,
+		Title:     data.Title,
+		Year:      data.Year,
+		Genre:     data.Genre,
+		Performer: data.Performer,
+		Duration:  data.Duration,
+		AlbumID:   data.AlbumID,
+	}
 	sql, _, _ := goqu.Update(entity.TABLE_SONGS).
 		Set(goqu.Record{
 			"title":     song.Title,

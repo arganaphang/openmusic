@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/arganaphang/openmusic/internal/dto"
-	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/arganaphang/openmusic/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +38,12 @@ func NewSongRoute(engine *gin.Engine, services *service.Services) SongRoute {
 }
 
 func (r songRoute) GetAll(c *gin.Context) {
-	songs, err := r.Services.SongService.GetAll(c)
+	var params dto.SongGetAllRequest
+	if err := c.BindQuery(&params); err != nil {
+		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
+		return
+	}
+	songs, err := r.Services.SongService.GetAll(c, params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -75,14 +79,7 @@ func (r songRoute) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	song, err := r.Services.SongService.Create(c, entity.Song{
-		Title:     body.Title,
-		Year:      body.Year,
-		Genre:     body.Genre,
-		Performer: body.Performer,
-		Duration:  body.Duration,
-		AlbumID:   body.AlbumID,
-	})
+	song, err := r.Services.SongService.Create(c, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
@@ -106,14 +103,7 @@ func (r songRoute) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return
 	}
-	song, err := r.Services.SongService.Update(c, id, entity.Song{
-		Title:     body.Title,
-		Year:      body.Year,
-		Genre:     body.Genre,
-		Performer: body.Performer,
-		Duration:  body.Duration,
-		AlbumID:   body.AlbumID,
-	})
+	song, err := r.Services.SongService.Update(c, id, body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.CommonResponse{Status: "fail", Message: err.Error()})
 		return

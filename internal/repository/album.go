@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/arganaphang/openmusic/internal/dto"
 	"github.com/arganaphang/openmusic/internal/entity"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/jmoiron/sqlx"
@@ -13,8 +14,8 @@ import (
 type AlbumRepository interface {
 	GetAll(ctx context.Context) ([]entity.Album, error)
 	GetByID(ctx context.Context, id string) (*entity.Album, error)
-	Create(ctx context.Context, album entity.Album) (*entity.Album, error)
-	Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error)
+	Create(ctx context.Context, data dto.AlbumCreateRequest) (*entity.Album, error)
+	Update(ctx context.Context, id string, data dto.AlbumUpdateRequest) (*entity.Album, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -46,8 +47,12 @@ func (r albumRepository) GetByID(ctx context.Context, id string) (*entity.Album,
 	return &album, nil
 }
 
-func (r albumRepository) Create(ctx context.Context, album entity.Album) (*entity.Album, error) {
-	album.ID = fmt.Sprintf("album-%s", gonanoid.Must())
+func (r albumRepository) Create(ctx context.Context, data dto.AlbumCreateRequest) (*entity.Album, error) {
+	album := entity.Album{
+		ID:   fmt.Sprintf("album-%s", gonanoid.Must()),
+		Name: data.Name,
+		Year: data.Year,
+	}
 	sql, _, _ := goqu.Insert(entity.TABLE_ALBUMS).
 		Cols("id", "name", "year").
 		Vals(goqu.Vals{album.ID, album.Name, album.Year}).
@@ -58,8 +63,12 @@ func (r albumRepository) Create(ctx context.Context, album entity.Album) (*entit
 	return &album, nil
 }
 
-func (r albumRepository) Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error) {
-	album.ID = id
+func (r albumRepository) Update(ctx context.Context, id string, data dto.AlbumUpdateRequest) (*entity.Album, error) {
+	album := entity.Album{
+		ID:   id,
+		Name: data.Name,
+		Year: data.Year,
+	}
 	sql, _, err := goqu.Update(entity.TABLE_ALBUMS).
 		Set(goqu.Record{
 			"name": album.Name,

@@ -2,6 +2,11 @@ package dto
 
 import "github.com/arganaphang/openmusic/internal/entity"
 
+type SongGetAllRequest struct {
+	Title     string `json:"title" form:"title"`
+	Performer string `json:"performer" form:"performer"`
+}
+
 type UserGetAllResponse struct {
 	Status  string                 `json:"status"`
 	Message string                 `json:"message"`
