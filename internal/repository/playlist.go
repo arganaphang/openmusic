@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/arganaphang/openmusic/internal/entity"
-	"github.com/arganaphang/openmusic/internal/repository/queries"
+	"github.com/jmoiron/sqlx"
 )
 
 type PlaylistRepository interface {
@@ -16,12 +16,12 @@ type PlaylistRepository interface {
 }
 
 type playlistRepository struct {
-	Queries *queries.Queries
+	DB *sqlx.DB
 }
 
-func NewPlaylistRepository(queries *queries.Queries) PlaylistRepository {
+func NewPlaylistRepository(DB *sqlx.DB) PlaylistRepository {
 	return &playlistRepository{
-		Queries: queries,
+		DB: DB,
 	}
 }
 

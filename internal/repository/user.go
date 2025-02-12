@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/arganaphang/openmusic/internal/entity"
-	"github.com/arganaphang/openmusic/internal/repository/queries"
+	"github.com/jmoiron/sqlx"
 )
 
 type UserRepository interface {
@@ -17,12 +17,12 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	Queries *queries.Queries
+	DB *sqlx.DB
 }
 
-func NewUserRepository(queries *queries.Queries) UserRepository {
+func NewUserRepository(DB *sqlx.DB) UserRepository {
 	return &userRepository{
-		Queries: queries,
+		DB: DB,
 	}
 }
 

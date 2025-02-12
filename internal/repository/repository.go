@@ -1,9 +1,6 @@
 package repository
 
-import (
-	"github.com/arganaphang/openmusic/internal/repository/queries"
-	"github.com/jackc/pgx/v5"
-)
+import "github.com/jmoiron/sqlx"
 
 type Repositories struct {
 	AlbumRepository    AlbumRepository
@@ -12,12 +9,11 @@ type Repositories struct {
 	UserRepository     UserRepository
 }
 
-func NewRepositories(DB *pgx.Conn) *Repositories {
-	queries := queries.New(DB)
+func NewRepositories(DB *sqlx.DB) *Repositories {
 	return &Repositories{
-		AlbumRepository:    NewAlbumRepository(queries),
-		PlaylistRepository: NewPlaylistRepository(queries),
-		SongRepository:     NewSongRepository(queries),
-		UserRepository:     NewUserRepository(queries),
+		AlbumRepository:    NewAlbumRepository(DB),
+		PlaylistRepository: NewPlaylistRepository(DB),
+		SongRepository:     NewSongRepository(DB),
+		UserRepository:     NewUserRepository(DB),
 	}
 }

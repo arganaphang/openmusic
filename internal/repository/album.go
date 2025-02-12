@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/arganaphang/openmusic/internal/entity"
-	"github.com/arganaphang/openmusic/internal/repository/queries"
+	"github.com/doug-martin/goqu/v9"
+	"github.com/jmoiron/sqlx"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -18,75 +19,65 @@ type AlbumRepository interface {
 }
 
 type albumRepository struct {
-	Queries *queries.Queries
+	DB *sqlx.DB
 }
 
-func NewAlbumRepository(queries *queries.Queries) AlbumRepository {
+func NewAlbumRepository(DB *sqlx.DB) AlbumRepository {
 	return &albumRepository{
-		Queries: queries,
+		DB: DB,
 	}
 }
 
 func (r albumRepository) GetAll(ctx context.Context) ([]entity.Album, error) {
-	results, err := r.Queries.GetAlbums(ctx)
-	if err != nil {
-		return nil, err
-	}
+	sql, _, _ := goqu.From(entity.TABLE_ALBUMS).ToSQL()
 	albums := []entity.Album{}
-	for _, row := range results {
-		albums = append(albums, entity.Album{
-			ID:   row.ID,
-			Name: row.Name,
-			Year: row.Year,
-		})
+	if err := r.DB.Select(&albums, sql); err != nil {
+		return nil, err
 	}
 	return albums, nil
 }
 
 func (r albumRepository) GetByID(ctx context.Context, id string) (*entity.Album, error) {
-	row, err := r.Queries.GetAlbumByID(ctx, id)
-	if err != nil {
+	sql, _, _ := goqu.From(entity.TABLE_ALBUMS).Where(goqu.Ex{"id": id}).ToSQL()
+	album := entity.Album{}
+	if err := r.DB.Get(&album, sql); err != nil {
 		return nil, err
 	}
-	return &entity.Album{
-		ID:   row.ID,
-		Name: row.Name,
-		Year: row.Year,
-	}, nil
+	return &album, nil
 }
 
 func (r albumRepository) Create(ctx context.Context, album entity.Album) (*entity.Album, error) {
-	result, err := r.Queries.CreateAlbum(ctx, queries.CreateAlbumParams{
-		ID:   fmt.Sprintf("album-%s", gonanoid.Must()),
-		Name: album.Name,
-		Year: album.Year,
-	})
-	if err != nil {
+	id := fmt.Sprintf("album-%s", gonanoid.Must())
+	sql, _, _ := goqu.Insert(entity.TABLE_ALBUMS).
+		Cols("id", "name", "year").
+		Vals(goqu.Vals{id, album.Name, album.Name}).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
 	}
-	return &entity.Album{
-		ID:   result.ID,
-		Name: result.Name,
-		Year: result.Year,
-	}, nil
+	return &album, nil
 }
 
 func (r albumRepository) Update(ctx context.Context, id string, album entity.Album) (*entity.Album, error) {
-	result, err := r.Queries.UpdateAlbum(ctx, queries.UpdateAlbumParams{
-		ID:   id,
-		Name: album.Name,
-		Year: album.Year,
-	})
-	if err != nil {
+	sql, _, _ := goqu.Update(entity.TABLE_ALBUMS).
+		Set(goqu.Record{
+			"name": album.Name,
+			"year": album.Year,
+		}).
+		Where(goqu.C("id").Eq(id)).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
 	}
-	return &entity.Album{
-		ID:   result.ID,
-		Name: result.Name,
-		Year: result.Year,
-	}, nil
+	return &album, nil
 }
 
 func (r albumRepository) Delete(ctx context.Context, id string) error {
-	return r.Queries.DeleteAlbum(ctx, id)
+	sql, _, _ := goqu.Delete(entity.TABLE_ALBUMS).
+		Where(goqu.C("id").Eq(id)).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
+		return err
+	}
+	return nil
 }

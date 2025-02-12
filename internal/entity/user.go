@@ -2,6 +2,8 @@ package entity
 
 import "time"
 
+const TABLE_USERS = "users"
+
 type UserJWT struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`

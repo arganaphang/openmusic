@@ -31,12 +31,12 @@ health:
 
 # migrate-create -> create migration
 migrate-create NAME:
-	migrate create -ext sql -dir ./database/migrations -seq {{NAME}}
+	migrate create -ext sql -dir ./migrations -seq {{NAME}}
 
 # migrate-up -> up migration
 migrate-up:
-	migrate -path ./database/migrations -database "$DATABASE_URL" up
+	migrate -path ./migrations -database "$DATABASE_URL" up
 
 # migrate-down -> down migration
 migrate-down:
-	migrate -path ./database/migrations -database "$DATABASE_URL" down
+	migrate -path ./migrations -database "$DATABASE_URL" down

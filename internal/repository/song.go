@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/arganaphang/openmusic/internal/entity"
-	"github.com/arganaphang/openmusic/internal/repository/queries"
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/doug-martin/goqu/v9"
+	"github.com/jmoiron/sqlx"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -20,153 +20,78 @@ type SongRepository interface {
 }
 
 type songRepository struct {
-	Queries *queries.Queries
+	DB *sqlx.DB
 }
 
-func NewSongRepository(queries *queries.Queries) SongRepository {
+func NewSongRepository(DB *sqlx.DB) SongRepository {
 	return &songRepository{
-		Queries: queries,
+		DB: DB,
 	}
 }
 
 func (r songRepository) GetAll(ctx context.Context) ([]entity.Song, error) {
-	results, err := r.Queries.GetSongs(ctx)
-	if err != nil {
-		return nil, err
-	}
+	sql, _, _ := goqu.From(entity.TABLE_SONGS).ToSQL()
 	songs := []entity.Song{}
-	for _, result := range results {
-		var albumID *string
-		if result.AlbumID.Valid {
-			albumID = &result.AlbumID.String
-		}
-		songs = append(songs, entity.Song{
-			ID:        result.ID,
-			Title:     result.Title,
-			Performer: result.Performer,
-			AlbumID:   albumID,
-			Year:      result.Year,
-			Genre:     result.Genre,
-			Duration:  result.Duration,
-			CreatedAt: result.CreatedAt.Time,
-		})
+	if err := r.DB.Select(&songs, sql); err != nil {
+		return nil, err
 	}
 	return songs, nil
 }
 
 func (r songRepository) GetByID(ctx context.Context, id string) (*entity.Song, error) {
-	result, err := r.Queries.GetSongByID(ctx, id)
-	if err != nil {
+	sql, _, _ := goqu.From(entity.TABLE_SONGS).Where(goqu.Ex{"id": id}).ToSQL()
+	song := entity.Song{}
+	if err := r.DB.Get(&song, sql); err != nil {
 		return nil, err
 	}
-	var albumID *string
-	if result.AlbumID.Valid {
-		albumID = &result.AlbumID.String
-	}
-	return &entity.Song{
-		ID:        result.ID,
-		Title:     result.Title,
-		Performer: result.Performer,
-		AlbumID:   albumID,
-		Year:      result.Year,
-		Genre:     result.Genre,
-		Duration:  result.Duration,
-		CreatedAt: result.CreatedAt.Time,
-	}, nil
+	return &song, nil
 }
 
 func (r songRepository) GetByAlbumID(ctx context.Context, albumID string) ([]entity.Song, error) {
-	results, err := r.Queries.GetSongByAlbumID(ctx, pgtype.Text{
-		Valid:  true,
-		String: albumID,
-	})
-	if err != nil {
-		return nil, err
-	}
+	sql, _, _ := goqu.From(entity.TABLE_SONGS).Where(goqu.C("album_id").Eq(albumID)).ToSQL()
 	songs := []entity.Song{}
-	for _, result := range results {
-		var albumID *string
-		if result.AlbumID.Valid {
-			albumID = &result.AlbumID.String
-		}
-		songs = append(songs, entity.Song{
-			ID:        result.ID,
-			Title:     result.Title,
-			Performer: result.Performer,
-			AlbumID:   albumID,
-			Year:      result.Year,
-			Genre:     result.Genre,
-			Duration:  result.Duration,
-			CreatedAt: result.CreatedAt.Time,
-		})
+	if err := r.DB.Select(&songs, sql); err != nil {
+		return nil, err
 	}
 	return songs, nil
 }
 
 func (r songRepository) Create(ctx context.Context, song entity.Song) (*entity.Song, error) {
-	var albumID string
-	if song.AlbumID != nil {
-		albumID = *song.AlbumID
-	}
-	result, err := r.Queries.CreateSong(ctx, queries.CreateSongParams{
-		ID:        fmt.Sprintf("song-%s", gonanoid.Must()),
-		Title:     song.Title,
-		Year:      song.Year,
-		Genre:     song.Genre,
-		Performer: song.Performer,
-		Duration:  song.Duration,
-		AlbumID: pgtype.Text{
-			Valid:  song.AlbumID != nil,
-			String: albumID,
-		},
-	})
-	if err != nil {
+	id := fmt.Sprintf("song-%s", gonanoid.Must())
+	sql, _, _ := goqu.Insert(entity.TABLE_SONGS).
+		Cols("id", "title", "year", "genre", "performer", "duration", "album_id").
+		Vals(goqu.Vals{id, song.Title, song.Year, song.Genre, song.Performer, song.Duration, song.AlbumID}).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
 	}
-	return &entity.Song{
-		ID:        result.ID,
-		Title:     result.Title,
-		Performer: result.Performer,
-		AlbumID:   &albumID,
-		Year:      result.Year,
-		Genre:     result.Genre,
-		Duration:  result.Duration,
-		CreatedAt: result.CreatedAt.Time,
-	}, nil
+	return &song, nil
 }
 
 func (r songRepository) Update(ctx context.Context, id string, song entity.Song) (*entity.Song, error) {
-	var albumID string
-	if song.AlbumID != nil {
-		albumID = *song.AlbumID
-	}
-	result, err := r.Queries.UpdateSong(ctx, queries.UpdateSongParams{
-		ID:        id,
-		Title:     song.Title,
-		Year:      song.Year,
-		Genre:     song.Genre,
-		Performer: song.Performer,
-		Duration:  song.Duration,
-		AlbumID: pgtype.Text{
-			Valid:  song.AlbumID != nil,
-			String: albumID,
-		},
-	})
-	if err != nil {
+	sql, _, _ := goqu.Update(entity.TABLE_ALBUMS).
+		Set(goqu.Record{
+			"title":     song.Title,
+			"year":      song.Year,
+			"genre":     song.Genre,
+			"performer": song.Performer,
+			"duration":  song.Duration,
+			"album_id":  song.AlbumID,
+		}).
+		Where(goqu.C("id").Eq(id)).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
 		return nil, err
 	}
-	return &entity.Song{
-		ID:        result.ID,
-		Title:     result.Title,
-		Performer: result.Performer,
-		AlbumID:   &albumID,
-		Year:      result.Year,
-		Genre:     result.Genre,
-		Duration:  result.Duration,
-		CreatedAt: result.CreatedAt.Time,
-	}, nil
+	return &song, nil
 }
 
 func (r songRepository) Delete(ctx context.Context, id string) error {
-	return r.Queries.DeleteSong(ctx, id)
+	sql, _, _ := goqu.Delete(entity.TABLE_SONGS).
+		Where(goqu.C("id").Eq(id)).
+		ToSQL()
+	if _, err := r.DB.Exec(sql); err != nil {
+		return err
+	}
+	return nil
 }
